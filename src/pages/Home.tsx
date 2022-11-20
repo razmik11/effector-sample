@@ -1,15 +1,24 @@
-import { useEffect, useState } from 'react';
-import { API_URL } from '../shared/constants';
-import { ListItem } from '../shared/types';
+import { useEvent, useStore } from 'effector-react';
+import { useEffect } from 'react';
+import {
+  $inputValue,
+  $list,
+  homeMounted,
+  inputValueChanged,
+} from '../store/effector';
 
 function Home() {
-  const [list, setList] = useState<ListItem[]>([]);
+  const inputValue = useStore($inputValue);
+  const list = useStore($list);
+  const handleHomeMount = useEvent(homeMounted);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((res) => setList(res));
-  }, []);
+    handleHomeMount();
+  }, [handleHomeMount]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    inputValueChanged(e.target.value);
+  };
 
   return (
     <div>
@@ -19,6 +28,7 @@ function Home() {
           return <li key={item.id}>{item.title}</li>;
         })}
       </ul>
+      <input value={inputValue} onChange={handleChange} />
     </div>
   );
 }
